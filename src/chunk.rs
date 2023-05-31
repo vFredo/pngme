@@ -2,11 +2,11 @@ use std::convert::TryFrom;
 use std::fmt;
 use std::io::{BufReader, Read};
 
-use crate::{Error, Result};
 use crate::chunk_type::ChunkType;
+use crate::{Error, Result};
 
 #[derive(Debug, Clone)]
-pub struct Chunk { 
+pub struct Chunk {
     chunk_type: ChunkType,
     data: Vec<u8>,
 }
@@ -89,14 +89,16 @@ mod tests {
             .chain(crc.to_be_bytes().iter())
             .copied()
             .collect();
-        
+
         Chunk::try_from(chunk_data.as_ref()).unwrap()
     }
 
     #[test]
     fn test_new_chunk() {
         let chunk_type = ChunkType::from_str("RuSt").unwrap();
-        let data = "This is where your secret message will be!".as_bytes().to_vec();
+        let data = "This is where your secret message will be!"
+            .as_bytes()
+            .to_vec();
         let chunk = Chunk::new(chunk_type, data);
         assert_eq!(chunk.length(), 42);
         assert_eq!(chunk.crc(), 2882656334);
@@ -191,9 +193,9 @@ mod tests {
             .chain(crc.to_be_bytes().iter())
             .copied()
             .collect();
-        
+
         let chunk: Chunk = TryFrom::try_from(chunk_data.as_ref()).unwrap();
-        
+
         let _chunk_string = format!("{}", chunk);
     }
 }

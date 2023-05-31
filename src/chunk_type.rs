@@ -39,12 +39,11 @@ impl ChunkType {
 
     /// Returns true if the reserved byte is valid and all four bytes are represented by the characters A-Z or a-z.
     pub fn is_valid(&self) -> bool {
-        for byte in self.identifier {
-            if !(byte >= b'a' && byte <= b'z') && !(byte >= b'A' && byte <= b'Z') {
-                return false;
-            }
-        }
-        self.is_reserved_bit_valid()
+        let valid_bytes = self
+            .identifier
+            .iter()
+            .all(|&byte| (byte >= b'a' && byte <= b'z') || (byte >= b'A' && byte <= b'Z'));
+        valid_bytes && self.is_reserved_bit_valid()
     }
 
     /// Valid bytes are represented by the characters A-Z or a-z
@@ -68,12 +67,13 @@ impl TryFrom<[u8; 4]> for ChunkType {
     type Error = Error;
 
     fn try_from(bytes: [u8; 4]) -> Result<Self> {
-        for byte in bytes {
-            if !Self::is_valid_byte(byte) {
-                return Err(Box::new(ChunkTypeError::InvalidCharacter));
-            }
+        let valid_bytes = bytes.iter().all(|&byte| Self::is_valid_byte(byte));
+
+        if valid_bytes {
+            Ok(Self { identifier: bytes })
+        } else {
+            Err(Box::new(ChunkTypeError::InvalidCharacter))
         }
-        Ok(Self { identifier: bytes })
     }
 }
 
@@ -82,12 +82,13 @@ impl FromStr for ChunkType {
 
     fn from_str(s: &str) -> Result<Self> {
         let bytes = s.as_bytes();
-        if bytes.len() != 4 {
-            return Err(Box::new(ChunkTypeError::ByteLengthError(bytes.len())));
-        }
 
-        let bytes: [u8; 4] = [bytes[0], bytes[1], bytes[2], bytes[3]];
-        Ok(Self::try_from(bytes)?)
+        if bytes.len() == 4 {
+            let bytes: [u8; 4] = [bytes[0], bytes[1], bytes[2], bytes[3]];
+            Ok(Self::try_from(bytes)?)
+        } else {
+            Err(Box::new(ChunkTypeError::ByteLengthError(bytes.len())))
+        }
     }
 }
 
