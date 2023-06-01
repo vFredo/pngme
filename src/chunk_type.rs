@@ -11,6 +11,7 @@ pub struct ChunkType {
     identifier: [u8; 4],
 }
 
+#[allow(dead_code)]
 impl ChunkType {
     /// Returns the raw bytes contained in the ChunkType
     pub fn bytes(&self) -> [u8; 4] {
@@ -113,7 +114,7 @@ impl fmt::Display for ChunkTypeError {
                 actual
             ),
             ChunkTypeError::InvalidCharacter => {
-                write!(f, "Input contains one or more invalid characters")
+                write!(f, "Input contains invalid characters")
             }
         }
     }

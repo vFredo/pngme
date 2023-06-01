@@ -131,16 +131,16 @@ impl TryFrom<&[u8]> for Chunk {
 impl fmt::Display for Chunk {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "Chunk {{",)?;
-        writeln!(f, "\tLength: {}", self.length())?;
-        writeln!(f, "\tType: {}", self.chunk_type())?;
+        writeln!(f, "\t\tLength: {}", self.length())?;
+        writeln!(f, "\t\tType: {}", self.chunk_type())?;
         writeln!(
             f,
-            "\tData: {}",
+            "\t\tData: {}",
             self.data_as_string()
                 .unwrap_or_else(|_| "<Invalid UTF-8>".to_owned())
         )?;
-        writeln!(f, "\tCrc: {}", self.crc())?;
-        writeln!(f, "}}",)?;
+        writeln!(f, "\t\tCrc: {}", self.crc())?;
+        writeln!(f, "\t}}",)?;
         Ok(())
     }
 }
@@ -161,12 +161,12 @@ impl fmt::Display for ChunkError {
         match self {
             ChunkError::InvalidCrc(expected, actual) => write!(
                 f,
-                "Invalid CRC constructing Chunk. Expected {} but found {}",
+                "Invalid CRC for Chunk. Expected {} but found {}",
                 expected, actual
             ),
             ChunkError::InvalidInput(actual) => write!(
                 f,
-                "Minimun lenght of bytes expected {} but found {}",
+                "Invalid lenght of bytes. Expected {} but found {}",
                 Chunk::MIN_BYTES,
                 actual
             ),

@@ -116,17 +116,17 @@ impl TryFrom<&[u8]> for Png {
             chunks.push(chunk);
         }
 
-        Ok(Png { chunks })
+        Ok(Self::from_chunks(chunks))
     }
 }
 
 impl fmt::Display for Png {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Chunks [")?;
+        writeln!(f, "PNG File [")?;
         for chunk in self.chunks.iter() {
             writeln!(f, "\t{}", chunk)?;
         }
-        write!(f, "]")?;
+        writeln!(f, "]")?;
         Ok(())
     }
 }
