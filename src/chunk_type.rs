@@ -57,7 +57,6 @@ impl ChunkType {
     }
 }
 
-
 impl TryFrom<[u8; 4]> for ChunkType {
     type Error = Error;
 

@@ -60,7 +60,7 @@ impl Chunk {
     /// Returns the data stored in this chunk as a `String`.
     /// This function will return an error if the stored data is not valid UTF-8.
     pub fn data_as_string(&self) -> Result<String> {
-        Ok(String::from_utf8(self.data.to_vec())?)
+        Ok(String::from_utf8(self.data().to_vec())?)
     }
 
     /// Returns this chunk as a byte sequences described by the PNG spec.
@@ -70,7 +70,7 @@ impl Chunk {
     /// 3. The data itself *(`length` bytes)*
     /// 4. The CRC of the chunk type and data *(4 bytes)*
     pub fn as_bytes(&self) -> Vec<u8> {
-        self.size
+        self.length()
             .to_be_bytes()
             .iter()
             .chain(self.chunk_type.bytes().iter())
@@ -131,10 +131,15 @@ impl TryFrom<&[u8]> for Chunk {
 impl fmt::Display for Chunk {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "Chunk {{",)?;
-        writeln!(f, "  Length: {}", self.length())?;
-        writeln!(f, "  Type: {}", self.chunk_type())?;
-        writeln!(f, "  Data: {} bytes", self.data().len())?;
-        writeln!(f, "  Crc: {}", self.crc())?;
+        writeln!(f, "\tLength: {}", self.length())?;
+        writeln!(f, "\tType: {}", self.chunk_type())?;
+        writeln!(
+            f,
+            "\tData: {}",
+            self.data_as_string()
+                .unwrap_or_else(|_| "<Invalid UTF-8>".to_owned())
+        )?;
+        writeln!(f, "\tCrc: {}", self.crc())?;
         writeln!(f, "}}",)?;
         Ok(())
     }

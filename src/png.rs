@@ -69,15 +69,17 @@ impl Png {
     /// Returns this `Png` as a byte sequence.
     /// These bytes will contain the header followed by the bytes of all of the chunks.
     pub fn as_bytes(&self) -> Vec<u8> {
-        let mut bytes: Vec<u8> = self.header().iter().copied().collect();
-        let mut chunks_bytes: Vec<u8> = self
+        let chunks_bytes: Vec<u8> = self
             .chunks()
             .iter()
             .flat_map(|chunk| chunk.as_bytes())
             .collect();
 
-        bytes.append(&mut chunks_bytes);
-        bytes
+        self.header()
+            .iter()
+            .chain(chunks_bytes.iter())
+            .copied()
+            .collect()
     }
 }
 
@@ -120,7 +122,12 @@ impl TryFrom<&[u8]> for Png {
 
 impl fmt::Display for Png {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self.as_bytes())
+        write!(f, "Chunks [")?;
+        for chunk in self.chunks.iter() {
+            writeln!(f, "\t{}", chunk)?;
+        }
+        write!(f, "]")?;
+        Ok(())
     }
 }
 
