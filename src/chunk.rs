@@ -41,7 +41,7 @@ impl Chunk {
 
     /// The raw data of the Chunk in bytes
     pub fn data(&self) -> &[u8] {
-        &self.data
+        self.data.as_slice()
     }
 
     /// The CRC (Cyclic Redundancy Check) of this chunk
