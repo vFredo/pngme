@@ -12,37 +12,42 @@ pub struct ChunkType {
 }
 
 impl ChunkType {
-    /// Returns the raw bytes contained in this chunk
+    /// Returns the raw bytes contained in the ChunkType
     pub fn bytes(&self) -> [u8; 4] {
         self.identifier
     }
 
     /// Returns the property state of the first byte as described in the PNG spec
+    /// 0 (uppercase) = critical, 1 (lowercase) = ancillary.
     pub fn is_critical(&self) -> bool {
         self.identifier[0] & 1 << 5 == 0
     }
 
     /// Returns the property state of the second byte as described in the PNG spec
+    /// 0 (uppercase) = public, 1 (lowercase) = private.
     pub fn is_public(&self) -> bool {
         self.identifier[1] & 1 << 5 == 0
     }
 
     /// Returns the property state of the third byte as described in the PNG spec
+    /// Must be 0 (uppercase) in files conforming to this version of PNG.
     pub fn is_reserved_bit_valid(&self) -> bool {
         self.identifier[2] & 1 << 5 == 0
     }
 
     /// Returns the property state of the fourth byte as described in the PNG spec
+    /// 0 (uppercase) = unsafe to copy, 1 (lowercase) = safe to copy.
     pub fn is_safe_to_copy(&self) -> bool {
         self.identifier[3] & 1 << 5 != 0
     }
 
-    /// Returns true if the reserved byte is valid and all four bytes are represented by the characters A-Z or a-z.
+    /// Returns true if the reserved byte is valid
+    /// and all four bytes are represented by the characters A-Z or a-z.
     pub fn is_valid(&self) -> bool {
-        let valid_bytes = self
+        let valid_bytes: bool = self
             .identifier
             .iter()
-            .all(|&byte| (byte >= b'a' && byte <= b'z') || (byte >= b'A' && byte <= b'Z'));
+            .all(|&byte| ChunkType::is_valid_byte(byte));
         valid_bytes && self.is_reserved_bit_valid()
     }
 
@@ -57,7 +62,7 @@ pub enum ChunkTypeError {
     /// Chunk has incorrect number of bytes (4 expected)
     ByteLengthError(usize),
 
-    /// The input string contains an invalid character at the given index
+    /// The input string contains an invalid character
     InvalidCharacter,
 }
 
@@ -67,7 +72,7 @@ impl TryFrom<[u8; 4]> for ChunkType {
     type Error = Error;
 
     fn try_from(bytes: [u8; 4]) -> Result<Self> {
-        let valid_bytes = bytes.iter().all(|&byte| Self::is_valid_byte(byte));
+        let valid_bytes: bool = bytes.iter().all(|&byte| Self::is_valid_byte(byte));
 
         if valid_bytes {
             Ok(Self { identifier: bytes })
@@ -84,7 +89,7 @@ impl FromStr for ChunkType {
         let bytes = s.as_bytes();
 
         if bytes.len() == 4 {
-            let bytes: [u8; 4] = [bytes[0], bytes[1], bytes[2], bytes[3]];
+            let bytes: [u8; 4] = bytes.try_into().unwrap();
             Ok(Self::try_from(bytes)?)
         } else {
             Err(Box::new(ChunkTypeError::ByteLengthError(bytes.len())))
@@ -94,7 +99,7 @@ impl FromStr for ChunkType {
 
 impl fmt::Display for ChunkType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let s = std::str::from_utf8(&self.identifier).map_err(|_| fmt::Error)?;
+        let s = String::from_utf8(self.identifier.to_vec()).map_err(|_| fmt::Error)?;
         write!(f, "{}", s)
     }
 }
