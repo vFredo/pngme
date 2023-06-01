@@ -57,16 +57,6 @@ impl ChunkType {
     }
 }
 
-#[derive(Debug)]
-pub enum ChunkTypeError {
-    /// Chunk has incorrect number of bytes (4 expected)
-    ByteLengthError(usize),
-
-    /// The input string contains an invalid character
-    InvalidCharacter,
-}
-
-impl std::error::Error for ChunkTypeError {}
 
 impl TryFrom<[u8; 4]> for ChunkType {
     type Error = Error;
@@ -103,6 +93,17 @@ impl fmt::Display for ChunkType {
         write!(f, "{}", s)
     }
 }
+
+#[derive(Debug)]
+pub enum ChunkTypeError {
+    /// Chunk has incorrect number of bytes (4 expected)
+    ByteLengthError(usize),
+
+    /// The input string contains an invalid character
+    InvalidCharacter,
+}
+
+impl std::error::Error for ChunkTypeError {}
 
 impl fmt::Display for ChunkTypeError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

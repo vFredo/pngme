@@ -21,8 +21,8 @@ impl Chunk {
     pub const MIN_BYTES: usize = Chunk::LENGTH_BYTES + Chunk::CHUNK_TYPE_BYTES + Chunk::CRC_BYTES;
 
     /// Construct a new Chunk with a type and a data
-    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
-        Chunk {
+    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Self {
+        Self {
             size: data.len() as u32,
             chunk_type,
             data,
@@ -80,17 +80,6 @@ impl Chunk {
             .collect()
     }
 }
-
-#[derive(Debug)]
-pub enum ChunkError {
-    /// The input crc do not match the real crc
-    InvalidCrc(u32, u32),
-
-    /// The input is to small for the Chunk specifications
-    InvalidInput(usize),
-}
-
-impl std::error::Error for ChunkError {}
 
 impl TryFrom<&[u8]> for Chunk {
     type Error = Error;
@@ -150,6 +139,17 @@ impl fmt::Display for Chunk {
         Ok(())
     }
 }
+
+#[derive(Debug)]
+pub enum ChunkError {
+    /// The input crc do not match the real crc
+    InvalidCrc(u32, u32),
+
+    /// The input is to small for the Chunk specifications
+    InvalidInput(usize),
+}
+
+impl std::error::Error for ChunkError {}
 
 impl fmt::Display for ChunkError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
