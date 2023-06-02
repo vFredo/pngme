@@ -42,13 +42,13 @@ impl ChunkType {
         self.identifier[3] & 1 << 5 != 0
     }
 
-    /// Returns true if the reserved byte is valid
-    /// and all four bytes are represented by the characters A-Z or a-z.
+    /// Returns true if the reserved byte is valid and
+    /// if all four bytes are represented by the characters A-Z or a-z.
     pub fn is_valid(&self) -> bool {
         let valid_bytes: bool = self
             .identifier
             .iter()
-            .all(|&byte| ChunkType::is_valid_byte(byte));
+            .all(|&byte| Self::is_valid_byte(byte));
         valid_bytes && self.is_reserved_bit_valid()
     }
 
@@ -110,11 +110,11 @@ impl fmt::Display for ChunkTypeError {
         match self {
             ChunkTypeError::ByteLengthError(actual) => write!(
                 f,
-                "Expected 4 bytes but received {} when creating chunk type",
+                "Expected 4 bytes but received {} when creating the chunk type",
                 actual
             ),
             ChunkTypeError::InvalidCharacter => {
-                write!(f, "Input contains invalid characters")
+                write!(f, "Input contains one or more invalid characters")
             }
         }
     }

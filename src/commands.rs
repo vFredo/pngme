@@ -21,7 +21,7 @@ pub fn encode(args: EncodeArgs) -> Result<()> {
         Some(file) => fs::write(file, png.as_bytes())?,
         None => fs::write(args.file, png.as_bytes())?,
     }
-    println!("Chunk of type {} added", args.chunk_type);
+    println!("Chunk '{}' added", args.chunk_type);
     Ok(())
 }
 
@@ -31,7 +31,7 @@ pub fn decode(args: DecodeArgs) -> Result<()> {
     let find_chunk = png.chunk_by_type(&args.chunk_type);
     match find_chunk {
         Some(chunk) => println!("Message: {}", chunk.data_as_string()?),
-        None => println!("No message for Chunks of type: {}", args.chunk_type),
+        None => println!("No message for Chunk '{}'", args.chunk_type),
     }
     Ok(())
 }
@@ -42,7 +42,7 @@ pub fn remove(args: RemoveArgs) -> Result<()> {
     png.remove_chunk(&args.chunk_type)?;
 
     fs::write(args.file, png.as_bytes())?;
-    println!("Chunk of type {} removed", args.chunk_type);
+    println!("Chunk '{}' removed", args.chunk_type);
     Ok(())
 }
 

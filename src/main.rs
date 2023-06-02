@@ -12,10 +12,13 @@ pub type Result<T> = std::result::Result<T, Error>;
 fn main() -> Result<()> {
     let cli = args::Cli::parse();
     match cli.command {
-        args::PngMeArgs::Encode(args) => commands::encode(args)?,
-        args::PngMeArgs::Decode(args) => commands::decode(args)?,
-        args::PngMeArgs::Remove(args) => commands::remove(args)?,
-        args::PngMeArgs::Print(args) => commands::print_chunks(args)?,
-    };
+        args::PngMeArgs::Encode(args) => commands::encode(args),
+        args::PngMeArgs::Decode(args) => commands::decode(args),
+        args::PngMeArgs::Remove(args) => commands::remove(args),
+        args::PngMeArgs::Print(args) => commands::print_chunks(args),
+    }
+    .unwrap_or_else(|err| {
+        eprintln!("[x] {}", err);
+    });
     Ok(())
 }

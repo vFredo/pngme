@@ -42,9 +42,9 @@ impl Png {
             .chunks
             .iter()
             .position(|chunk| chunk.chunk_type().to_string() == chunk_type)
-            .ok_or(PngError::UnknownChunkType)?;
+            .ok_or(PngError::UnknownChunkType(chunk_type.to_string()))?;
 
-        let removed = self.chunks.remove(index);
+        let removed: Chunk = self.chunks.remove(index);
         Ok(removed)
     }
 
@@ -55,7 +55,7 @@ impl Png {
 
     /// Lists the `Chunk`s stored in this `Png`
     pub fn chunks(&self) -> &[Chunk] {
-        self.chunks.as_slice()
+        &self.chunks
     }
 
     /// Searches for a `Chunk` with the specified `chunk_type` and returns the first
@@ -135,7 +135,7 @@ impl fmt::Display for Png {
 pub enum PngError {
     InvalidHeader,
     TooSmall,
-    UnknownChunkType,
+    UnknownChunkType(String),
 }
 
 impl std::error::Error for PngError {}
@@ -143,9 +143,11 @@ impl std::error::Error for PngError {}
 impl fmt::Display for PngError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PngError::InvalidHeader => write!(f, "Invalid header"),
+            PngError::InvalidHeader => write!(f, "Invalid header for PNG file"),
             PngError::TooSmall => write!(f, "The given source is too small to be a valid PNG file"),
-            PngError::UnknownChunkType => write!(f, "Unknown chunk type"),
+            PngError::UnknownChunkType(chunk_type) => {
+                write!(f, "Unknown Chunk '{}'", chunk_type)
+            }
         }
     }
 }
