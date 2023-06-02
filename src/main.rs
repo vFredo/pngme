@@ -14,6 +14,7 @@ fn main() -> Result<()> {
     match cli.command {
         args::PngMeArgs::Encode(args) => commands::encode(args),
         args::PngMeArgs::Decode(args) => commands::decode(args),
+        args::PngMeArgs::Find(args) => commands::find(args),
         args::PngMeArgs::Remove(args) => commands::remove(args),
         args::PngMeArgs::Print(args) => commands::print_chunks(args),
     }

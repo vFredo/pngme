@@ -81,6 +81,21 @@ impl Png {
             .copied()
             .collect()
     }
+
+    /// Returns a vector of possible chunks that could have a message
+    pub fn find_possible_messages(&self) -> Option<Vec<&Chunk>> {
+        let candidates: Vec<&Chunk> = self
+            .chunks
+            .iter()
+            .filter(|&chunk| chunk.data_as_string().unwrap_or_else(|_| "".to_owned()) != "")
+            .collect();
+
+        if !candidates.is_empty() {
+            Some(candidates)
+        } else {
+            None
+        }
+    }
 }
 
 impl TryFrom<&[u8]> for Png {

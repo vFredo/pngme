@@ -1,7 +1,7 @@
 use std::fs;
 use std::str::FromStr;
 
-use crate::args::{DecodeArgs, EncodeArgs, PrintArgs, RemoveArgs};
+use crate::args::{DecodeArgs, EncodeArgs, PrintArgs, RemoveArgs, FindArgs};
 use crate::chunk::Chunk;
 use crate::chunk_type::ChunkType;
 use crate::png::Png;
@@ -32,6 +32,21 @@ pub fn decode(args: DecodeArgs) -> Result<()> {
     match find_chunk {
         Some(chunk) => println!("Message: {}", chunk.data_as_string()?),
         None => println!("No message for Chunk '{}'", args.chunk_type),
+    }
+    Ok(())
+}
+
+/// Searches for a message hidden in a PNG file and prints the message if one is found
+pub fn find(args: FindArgs) -> Result<()> {
+    let png: Png = Png::from_file(&args.file)?;
+
+    if let Some(chunks) = png.find_possible_messages() {
+        println!("Chunks with possible messages: ");
+        for &chunk in chunks.iter() {
+            println!("{}", chunk)
+        }
+    } else {
+        println!("Couldn't find any possbile with a message")
     }
     Ok(())
 }

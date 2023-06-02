@@ -14,6 +14,8 @@ pub enum PngMeArgs {
     Encode(EncodeArgs),
     /// Decode a message from a file knowing the chunk_type
     Decode(DecodeArgs),
+    /// Find possble Chunks in a PNG that could have a message
+    Find(FindArgs),
     /// Remove a chunk from a file knowing the chunk_type
     Remove(RemoveArgs),
     /// Print Chunks from a file
@@ -33,6 +35,11 @@ pub struct EncodeArgs {
 pub struct DecodeArgs {
     pub file: PathBuf,
     pub chunk_type: String,
+}
+
+#[derive(Args, Debug)]
+pub struct FindArgs {
+    pub file: PathBuf,
 }
 
 #[derive(Args, Debug)]
