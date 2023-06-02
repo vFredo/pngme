@@ -5,13 +5,13 @@ use crate::chunk_type::ChunkType;
 use crate::{Error, Result};
 use crc::{Crc, CRC_32_ISO_HDLC};
 
-const CRC_ALGORITHM: Crc<u32> = Crc::<u32>::new(&CRC_32_ISO_HDLC);
 
 #[derive(Debug, Clone)]
 pub struct Chunk {
     size: u32,
     chunk_type: ChunkType,
     data: Vec<u8>,
+    crc: u32,
 }
 
 impl Chunk {
@@ -22,10 +22,20 @@ impl Chunk {
 
     /// Construct a new Chunk with a type and a data
     pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Self {
+        let checker: Crc<u32> = Crc::<u32>::new(&CRC_32_ISO_HDLC);
+
+        let bytes: Vec<u8> = chunk_type
+            .bytes()
+            .iter()
+            .chain(data.iter())
+            .copied()
+            .collect();
+
         Self {
             size: data.len() as u32,
             chunk_type,
             data,
+            crc: checker.checksum(&bytes),
         }
     }
 
@@ -41,20 +51,12 @@ impl Chunk {
 
     /// The raw data of the Chunk in bytes
     pub fn data(&self) -> &[u8] {
-        self.data.as_slice()
+        &self.data
     }
 
     /// The CRC (Cyclic Redundancy Check) of this chunk
     pub fn crc(&self) -> u32 {
-        let bytes: Vec<u8> = self
-            .chunk_type
-            .bytes()
-            .iter()
-            .chain(self.data.iter())
-            .copied()
-            .collect();
-
-        CRC_ALGORITHM.checksum(&bytes)
+        self.crc
     }
 
     /// Returns the data stored in this chunk as a `String`.
@@ -63,8 +65,7 @@ impl Chunk {
         Ok(String::from_utf8(self.data().to_vec())?)
     }
 
-    /// Returns this chunk as a byte sequences described by the PNG spec.
-    /// The following data is included in this byte sequence in order:
+    /// Returns this chunk as a byte sequences described by the PNG spec in order:
     /// 1. Length of the data *(4 bytes)*
     /// 2. Chunk type *(4 bytes)*
     /// 3. The data itself *(`length` bytes)*
@@ -75,7 +76,7 @@ impl Chunk {
             .iter()
             .chain(self.chunk_type.bytes().iter())
             .chain(self.data.iter())
-            .chain(self.crc().to_be_bytes().iter())
+            .chain(self.crc.to_be_bytes().iter())
             .copied()
             .collect()
     }
