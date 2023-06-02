@@ -5,7 +5,6 @@ use crate::chunk_type::ChunkType;
 use crate::{Error, Result};
 use crc::{Crc, CRC_32_ISO_HDLC};
 
-
 #[derive(Debug, Clone)]
 pub struct Chunk {
     size: u32,
