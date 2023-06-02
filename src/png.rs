@@ -94,20 +94,26 @@ impl TryFrom<&[u8]> for Png {
         let mut chunks: Vec<Chunk> = Vec::new();
         let mut iter = bytes.iter().copied();
 
-        let header: Vec<u8> = iter.by_ref().take(Self::HEADER_LENGHT).collect();
-        if Self::STANDARD_HEADER != header.as_slice() {
+        let header: [u8; Self::HEADER_LENGHT] = iter
+            .by_ref()
+            .take(Self::HEADER_LENGHT)
+            .collect::<Vec<u8>>()
+            .try_into()
+            .unwrap();
+
+        if Self::STANDARD_HEADER != header {
             return Err(Box::new(PngError::InvalidHeader));
         }
 
         while iter.len() >= Chunk::MIN_BYTES {
-            let size: [u8; 4] = iter
+            let size: [u8; Chunk::LENGTH_BYTES] = iter
                 .clone()
                 .take(Chunk::LENGTH_BYTES)
                 .collect::<Vec<u8>>()
                 .try_into()
-                .map_err(|_| fmt::Error)?;
-
+                .unwrap();
             let size: u32 = u32::from_be_bytes(size);
+
             let chunk: Vec<u8> = iter
                 .by_ref()
                 .take(Chunk::MIN_BYTES + size as usize)

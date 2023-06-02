@@ -88,38 +88,35 @@ impl TryFrom<&[u8]> for Chunk {
         if bytes.len() < Chunk::MIN_BYTES {
             return Err(Box::new(ChunkError::InvalidInput(bytes.len())));
         }
-
         let mut iter = bytes.iter().copied();
 
-        let size: [u8; 4] = iter
+        let size: [u8; Chunk::LENGTH_BYTES] = iter
             .by_ref()
             .take(Chunk::LENGTH_BYTES)
             .collect::<Vec<u8>>()
             .try_into()
             .map_err(|_| fmt::Error)?;
-
         let size: u32 = u32::from_be_bytes(size);
 
-        let chunk_type: [u8; 4] = iter
+        let chunk_type: [u8; Chunk::CHUNK_TYPE_BYTES] = iter
             .by_ref()
             .take(Chunk::CHUNK_TYPE_BYTES)
             .collect::<Vec<u8>>()
             .try_into()
             .map_err(|_| fmt::Error)?;
-
         let chunk_type: ChunkType = ChunkType::try_from(chunk_type)?;
 
         let data: Vec<u8> = iter.by_ref().take(size as usize).collect();
-        let input_crc: [u8; 4] = iter
+
+        let input_crc: [u8; Chunk::CRC_BYTES] = iter
             .by_ref()
             .take(Chunk::CRC_BYTES)
             .collect::<Vec<u8>>()
             .try_into()
             .map_err(|_| fmt::Error)?;
-
         let input_crc: u32 = u32::from_be_bytes(input_crc);
-        let chunk: Chunk = Chunk::new(chunk_type, data);
 
+        let chunk: Chunk = Chunk::new(chunk_type, data);
         if chunk.crc() != input_crc {
             return Err(Box::new(ChunkError::InvalidCrc(chunk.crc(), input_crc)));
         }
