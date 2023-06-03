@@ -1,7 +1,7 @@
 use std::fs;
 use std::str::FromStr;
 
-use crate::args::{DecodeArgs, EncodeArgs, PrintArgs, RemoveArgs, FindArgs};
+use crate::args::{DecodeArgs, EncodeArgs, FindArgs, PrintArgs, RemoveArgs};
 use crate::chunk::Chunk;
 use crate::chunk_type::ChunkType;
 use crate::png::Png;
@@ -43,10 +43,10 @@ pub fn find(args: FindArgs) -> Result<()> {
     if let Some(chunks) = png.find_possible_messages() {
         println!("Chunks with possible messages: ");
         for &chunk in chunks.iter() {
-            println!("{}", chunk)
+            println!("{}", chunk);
         }
     } else {
-        println!("Couldn't find any possbile with a message")
+        println!("Couldn't find any possible Chunk with a message");
     }
     Ok(())
 }
