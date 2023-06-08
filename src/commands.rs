@@ -4,6 +4,7 @@ use std::str::FromStr;
 use crate::args::{DecodeArgs, EncodeArgs, FindArgs, PrintArgs, RemoveArgs};
 use crate::chunk::Chunk;
 use crate::chunk_type::ChunkType;
+use crate::cipher;
 use crate::png::Png;
 
 use crate::Result;
@@ -11,7 +12,7 @@ use crate::Result;
 /// Encodes a message into a PNG file and saves the result
 pub fn encode(args: EncodeArgs) -> Result<()> {
     let chunk_type = ChunkType::from_str(&args.chunk_type)?;
-    let data = args.message.clone().into_bytes();
+    let data = cipher::xor_encode(args.message.as_bytes(), &args.key);
     let new_chunk = Chunk::new(chunk_type, data);
 
     let mut png: Png = Png::from_file(&args.file)?;
@@ -30,7 +31,10 @@ pub fn decode(args: DecodeArgs) -> Result<()> {
     let png: Png = Png::from_file(&args.file)?;
     let find_chunk = png.chunk_by_type(&args.chunk_type);
     match find_chunk {
-        Some(chunk) => println!("Message: {}", chunk.data_as_string()?),
+        Some(chunk) => {
+            let message = cipher::xor_decode(chunk.data(), &args.key);
+            println!("Message: {}", message);
+        }
         None => println!("No message for Chunk '{}'", args.chunk_type),
     }
     Ok(())

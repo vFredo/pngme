@@ -28,6 +28,7 @@ pub struct EncodeArgs {
     pub file: PathBuf,
     pub chunk_type: String,
     pub message: String,
+    pub key: String,
     pub output: Option<PathBuf>,
 }
 
@@ -35,6 +36,7 @@ pub struct EncodeArgs {
 pub struct DecodeArgs {
     pub file: PathBuf,
     pub chunk_type: String,
+    pub key: String,
 }
 
 #[derive(Args, Debug)]

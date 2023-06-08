@@ -3,6 +3,7 @@ use clap::Parser;
 mod args;
 mod chunk;
 mod chunk_type;
+mod cipher;
 mod commands;
 mod png;
 
@@ -19,7 +20,7 @@ fn main() -> Result<()> {
         args::PngMeArgs::Print(args) => commands::print_chunks(args),
     }
     .unwrap_or_else(|err| {
-        eprintln!("[x] {}", err);
+        eprintln!("Error: {}", err);
     });
     Ok(())
 }
