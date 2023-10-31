@@ -7,7 +7,7 @@ A command line program that lets you encode/decode secret messages in PNG files.
 3. Remove the message from a PNG file.
 4. Print a list of PNG chunks that can be searched for messages.
 
-### Example
+### Example usage
 ```shell
 # To encoded
 pngme encode image.png RusT "Secret message" "Secret key"
@@ -15,11 +15,13 @@ pngme encode image.png RusT "Secret message" "Secret key"
 # To decoded
 pngme decode image.png RusT "Secret key"
 
-# To delete
+# To remove the secret message
 pngme remove image.png RusT
+
+# See other available commands
+pngme help
 ```
 
-
 ## References
-- [Rust introducction](https://doc.rust-lang.org/book/title-page.html)
+- [Rust introduction](https://doc.rust-lang.org/book/title-page.html)
 - [PNGme rust challenge](https://picklenerd.github.io/pngme_book/introduction.html)

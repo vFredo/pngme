@@ -31,10 +31,7 @@ pub fn decode(args: DecodeArgs) -> Result<()> {
     let png: Png = Png::from_file(&args.file)?;
     let find_chunk = png.chunk_by_type(&args.chunk_type);
     match find_chunk {
-        Some(chunk) => {
-            let message = cipher::xor_decode(chunk.data(), &args.key);
-            println!("Message: {}", message);
-        }
+        Some(chunk) => println!("Message: {}", cipher::xor_decode(chunk.data(), &args.key)),
         None => println!("No message for Chunk '{}'", args.chunk_type),
     }
     Ok(())
